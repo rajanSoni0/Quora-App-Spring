@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -36,9 +35,8 @@ public class JwtService {
         Date now = new Date();
         return Jwts.builder()
                 .subject(userDetails.getUsername())
-                .claims(Map.of(
-                        "uid", userDetails.getId(),
-                        "role", userDetails.getRole().name()))
+                .claim("uid", userDetails.getId())
+                .claim("role", userDetails.getRole().name())
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + accessTokenExpirationMs))
                 .signWith(signingKey)

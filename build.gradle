@@ -43,27 +43,40 @@ dependencies {
     // OpenAPI / Swagger UI
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocVersion}"
 
-    // env
-    implementation "me.paulschwarz:spring-dotenv:4.0.0"
+    // .env support (loads a .env file from the project root into the Spring Environment)
+    implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+
     // Mapping
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
     // Lets Lombok and MapStruct annotation processors cooperate
     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
+    // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtimeOnly 'com.mysql:mysql-connector-j'
 
-//    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-//    testImplementation 'org.springframework.security:spring-security-test'
-//    testRuntimeOnly 'com.h2database:h2'
-//    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // Databases: MySQL is the default; H2 is used by the tests and by the optional "h2" profile
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly 'com.h2database:h2'
+
+    // Tests (src/test/java) - required so the test source set compiles in the IDE
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
-//
-//tasks.named('test') {
-//    useJUnitPlatform()
-//}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ['-parameters']
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

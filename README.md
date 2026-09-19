@@ -517,68 +517,57 @@ Run tests with:
 
 ## ⚙️ Requirements
 
-* **Java 19+**
-* **MySQL 8**
-* Gradle Wrapper
-
-The project uses Java 19 as its configured toolchain.
+* **JDK 21** (the Gradle toolchain resolver downloads one automatically if it is missing)
+* **MySQL 8** running on `localhost:3306` — or use the `h2` profile to run without MySQL
+* Gradle Wrapper (bundled; no separate Gradle install needed)
 
 ---
 
 ## 🔧 Configuration
 
-Secrets are externalized through environment variables.
+All settings are read from environment variables or from a `.env` file in the project root (loaded automatically by `spring-dotenv`). Every value has a local-development default, so the app starts with **no configuration at all** as long as MySQL is reachable on `localhost:3306` with user `root` and an empty password.
 
 ```bash
-export DB_URL="jdbc:mysql://localhost:3306/QUORA_DB_LOCAL"
-export DB_USERNAME="root"
-export DB_PASSWORD="your-db-password"
+# .env (copy from .env.example)
+DB_URL=jdbc:mysql://localhost:3306/QUORA_DB_LOCAL?createDatabaseIfNotExist=true&serverTimezone=UTC
+DB_USERNAME=root
+DB_PASSWORD=
 
-export JWT_SECRET="$(openssl rand -base64 48)"
+JWT_SECRET=<base64 key, generate with: openssl rand -base64 48>
 
-export JWT_ACCESS_EXPIRATION_MS=900000
-export JWT_REFRESH_EXPIRATION_MS=604800000
+JWT_ACCESS_EXPIRATION_MS=900000
+JWT_REFRESH_EXPIRATION_MS=604800000
 
-export CORS_ALLOWED_ORIGINS="http://localhost:3000"
+CORS_ALLOWED_ORIGINS=http://localhost:3000
 ```
 
 Optional database configuration:
 
 ```bash
-export DDL_AUTO="update"
+DDL_AUTO=update
 ```
 
-For production deployments, schema validation should be combined with a migration tool such as Flyway or Liquibase.
-
-The application fails fast when required secrets such as `DB_PASSWORD` or `JWT_SECRET` are missing.
+For production deployments, schema validation should be combined with a migration tool such as Flyway or Liquibase, and `JWT_SECRET` / `DB_PASSWORD` **must** be set explicitly — the built-in defaults are for local development only.
 
 ---
 
 ## ▶️ Running Locally
 
-Clone the repository:
+### From IntelliJ IDEA
+
+1. **File → Open** the project folder (the one containing `build.gradle`) and let Gradle sync.
+2. Open `QuoraprojectApplication` and click the green **Run** button.
+
+That's it. The database `QUORA_DB_LOCAL` is created automatically on first start (`createDatabaseIfNotExist=true`).
+
+**No MySQL installed?** Edit the run configuration and set *Active profiles* to `h2`. The app then runs against an in-memory H2 database (browse it at `http://localhost:8080/h2-console`).
+
+### From the command line
 
 ```bash
-git clone <your-repository-url>
-cd quora-clone
-```
-
-Configure the required environment variables and create the MySQL database:
-
-```sql
-CREATE DATABASE QUORA_DB_LOCAL;
-```
-
-Start the application:
-
-```bash
-./gradlew bootRun
-```
-
-Run the test suite:
-
-```bash
-./gradlew test
+./gradlew bootRun                                     # MySQL (default)
+./gradlew bootRun --args='--spring.profiles.active=h2' # in-memory H2, no MySQL needed
+./gradlew test                                        # run the test suite
 ```
 
 Then open:
@@ -688,7 +677,7 @@ A detailed breakdown of these changes is available in `IMPROVEMENTS.md`.
 
 **Backend**
 
-* Java 19
+* Java 21
 * Spring Boot 3
 * Spring Security 6
 * Spring Data JPA

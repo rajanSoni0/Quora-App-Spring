@@ -1,1 +1,7 @@
+plugins {
+    // Auto-downloads a JDK 21 if one isn't installed, so the toolchain block in
+    // build.gradle never fails with "No matching toolchains found".
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
+}
+
 rootProject.name = 'quoraproject'
