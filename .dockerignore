@@ -1,8 +1,5 @@
 .gradle
-build
 .git
-.gitignore
 .idea
 *.iml
 .env
-README.md
